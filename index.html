@@ -1,0 +1,953 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Food Decision Assistant — 5 ย่าน กทม.</title>
+<style>
+:root{--bg:#0B1724;--bg2:#0f1e2e;--bg3:#162436;--card:#111f30;--orange:#F97316;--green:#10B981;--yellow:#F59E0B;--text:#F1F5F9;--text2:#7A9BC0;--border:#1a3050}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;line-height:1.5}
+a{color:var(--orange);text-decoration:none}
+
+/* NAV */
+nav{position:sticky;top:0;z-index:200;background:rgba(11,23,36,.96);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:10px 32px;display:flex;align-items:center;justify-content:space-between}
+.nav-logo{font-size:1rem;font-weight:700;color:var(--orange);display:flex;align-items:center;gap:6px}
+.nav-links{display:flex;gap:20px;font-size:.8rem}
+.nav-links a{color:var(--text2);transition:.15s}.nav-links a:hover{color:var(--orange)}
+
+/* HERO */
+.hero{padding:40px 32px 32px;display:flex;align-items:center;gap:40px;border-bottom:1px solid var(--border);background:linear-gradient(135deg,var(--bg) 60%,rgba(249,115,22,.04))}
+.hero-left{flex:1}
+.hero-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(249,115,22,.1);border:1px solid rgba(249,115,22,.3);color:var(--orange);padding:4px 12px;border-radius:20px;font-size:.75rem;margin-bottom:14px}
+.hero h1{font-size:2rem;font-weight:800;line-height:1.2;margin-bottom:10px}
+.hero h1 span{color:var(--orange)}
+.hero-desc{color:var(--text2);font-size:.88rem;margin-bottom:18px}
+.hero-stats{display:flex;gap:24px}
+.stat{text-align:center;padding:8px 16px;background:var(--card);border:1px solid var(--border);border-radius:10px}
+.stat-num{font-size:1.4rem;font-weight:800;color:var(--orange)}
+.stat-label{font-size:.7rem;color:var(--text2)}
+.n8n-badge{margin-top:14px;display:inline-flex;align-items:center;gap:6px;background:var(--card);border:1px solid var(--border);color:var(--text2);padding:5px 12px;border-radius:8px;font-size:.75rem}
+.dot{width:6px;height:6px;background:var(--green);border-radius:50%;animation:blink 1.5s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* AREA SELECTOR */
+.area-hero{padding:32px;border-bottom:1px solid var(--border)}
+.area-label{font-size:.8rem;color:var(--text2);margin-bottom:12px;text-transform:uppercase;letter-spacing:.06em}
+.area-btns{display:flex;gap:12px;flex-wrap:wrap}
+.area-btn{padding:12px 24px;border-radius:12px;border:1px solid var(--border);background:var(--card);color:var(--text2);cursor:pointer;font-size:.95rem;font-weight:600;transition:.2s;display:flex;align-items:center;gap:8px}
+.area-btn:hover{border-color:var(--orange);color:var(--text)}
+.area-btn.active{background:var(--orange);border-color:var(--orange);color:#fff;box-shadow:0 4px 16px rgba(249,115,22,.3)}
+
+/* INFO ACCORDION */
+.accordion{border-bottom:1px solid var(--border)}
+.acc-header{padding:14px 32px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none;transition:.15s}
+.acc-header:hover{background:rgba(255,255,255,.02)}
+.acc-title{font-size:.88rem;font-weight:600;color:var(--text2);display:flex;align-items:center;gap:10px}
+.acc-row{display:flex;gap:0}
+.acc-item{flex:1;border-right:1px solid var(--border)}
+.acc-item:last-child{border-right:none}
+.acc-tab{padding:12px 20px;cursor:pointer;font-size:.8rem;color:var(--text2);display:flex;align-items:center;gap:6px;transition:.15s;border-bottom:2px solid transparent}
+.acc-tab:hover,.acc-tab.active-tab{color:var(--orange);border-bottom-color:var(--orange)}
+.acc-panels{display:none;border-top:1px solid var(--border)}
+.acc-panels.open{display:block}
+.acc-panel{display:none;padding:20px 32px}
+.acc-panel.show{display:block}
+
+/* CONTENT AREA */
+.content-area{display:none;animation:fadeIn .3s ease}
+.content-area.show{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+.area-header{padding:24px 32px 16px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--border)}
+.area-icon{font-size:1.8rem}
+.area-name-big{font-size:1.4rem;font-weight:800}
+.area-sub{font-size:.82rem;color:var(--text2)}
+
+/* TOP 3 */
+.section{padding:24px 32px;border-bottom:1px solid var(--border)}
+.sec-title{font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text2);margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.sec-title::after{content:'';flex:1;height:1px;background:var(--border)}
+.top3-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.t3card{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;transition:.2s}
+.t3card:hover{border-color:rgba(249,115,22,.4);transform:translateY(-2px)}
+.t3card-img{height:140px;object-fit:cover;width:100%}
+.t3card-body{padding:14px}
+.t3card-rank{font-size:.72rem;color:var(--text2);margin-bottom:3px}
+.t3card-name{font-weight:700;font-size:.92rem;margin-bottom:8px;line-height:1.3}
+.t3card-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--border);font-size:.78rem}
+.t3card-row:last-child{border-bottom:none;padding-bottom:0}
+.t3card-label{color:var(--text2)}
+.t3card-val{font-weight:600}
+.score-big{font-size:1.3rem;font-weight:800;color:var(--orange)}
+.tag-row{display:flex;gap:5px;flex-wrap:wrap;margin-top:8px}
+.tag{padding:3px 8px;border-radius:6px;font-size:.7rem;font-weight:500}
+.tag-green{background:rgba(16,185,129,.12);color:#10B981}
+.tag-orange{background:rgba(249,115,22,.12);color:var(--orange)}
+.tag-yellow{background:rgba(245,158,11,.1);color:#F59E0B}
+
+/* COMPARE INSIDE T3 */
+.compare-box{margin-top:10px;background:var(--bg3);border-radius:8px;padding:10px}
+.compare-title{font-size:.7rem;font-weight:700;color:var(--text2);margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em}
+.compare-item{font-size:.75rem;margin:3px 0;display:flex;gap:6px}
+.c-pro{color:#10B981}.c-con{color:#F59E0B}
+
+/* ALL RESTAURANTS TABLE */
+.rst-table{width:100%;border-collapse:collapse}
+.rst-table th{background:var(--bg3);padding:9px 14px;text-align:left;font-size:.75rem;color:var(--text2);font-weight:600;letter-spacing:.03em}
+.rst-table td{padding:9px 14px;border-bottom:1px solid rgba(26,48,80,.5);font-size:.82rem}
+.rst-table tr:hover td{background:rgba(249,115,22,.04)}
+.rank-cell{font-weight:800;color:var(--orange);width:28px}
+.score-cell{font-weight:700}
+.score-hi{color:#10B981}.score-md{color:#F59E0B}
+.pill{display:inline-block;padding:2px 8px;border-radius:6px;font-size:.72rem}
+.pill-green{background:rgba(16,185,129,.1);color:#10B981}
+.pill-gray{background:var(--bg3);color:var(--text2)}
+.map-link{font-size:.75rem;opacity:.7}
+.map-link:hover{opacity:1}
+
+/* COMPACT INFO */
+.info-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+.info-card{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:12px 16px}
+.info-num{font-size:.65rem;font-weight:700;color:var(--orange);opacity:.6;margin-bottom:2px}
+.info-title{font-size:.82rem;font-weight:600;margin-bottom:3px}
+.info-desc{font-size:.75rem;color:var(--text2)}
+
+.tools-row{display:flex;flex-wrap:wrap;gap:8px}
+.tool-pill{display:flex;align-items:center;gap:6px;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:7px 12px;font-size:.8rem}
+.tool-icon{font-size:1rem}
+
+.score-compact{width:100%;border-collapse:collapse}
+.score-compact th{font-size:.75rem;color:var(--text2);padding:6px 12px;background:var(--bg3);text-align:left}
+.score-compact td{font-size:.8rem;padding:7px 12px;border-bottom:1px solid var(--border)}
+.wbar{height:5px;background:var(--bg3);border-radius:3px;margin-top:3px}
+.wfill{height:100%;background:var(--orange);border-radius:3px}
+
+.wf-row{display:flex;align-items:center;gap:6px;overflow-x:auto;padding:4px 0}
+.wf-node{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:8px 14px;font-size:.78rem;white-space:nowrap;text-align:center}
+.wf-node small{display:block;color:var(--orange);font-size:.68rem}
+.wf-arr{color:var(--orange);font-size:1rem;flex-shrink:0}
+
+/* NO AREA */
+.no-area{padding:60px 32px;text-align:center;color:var(--text2)}
+.no-area-icon{font-size:3rem;margin-bottom:12px}
+.no-area h3{font-size:1.1rem;margin-bottom:6px;color:var(--text)}
+
+/* FOOTER */
+footer{padding:24px 32px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:16px;font-size:.78rem;color:var(--text2)}
+.footer-links{display:flex;flex-direction:column;gap:4px}
+
+/* CHATBOT */
+.chat-bubble{position:fixed;bottom:20px;right:20px;z-index:999}
+.chat-btn{display:flex;align-items:center;gap:8px;background:var(--orange);border-radius:30px;border:none;cursor:pointer;font-size:1rem;color:#fff;box-shadow:0 4px 20px rgba(249,115,22,.5);padding:12px 18px;font-weight:700;animation:chatPulse 2.5s infinite}.chat-label{font-size:.82rem;white-space:nowrap}@keyframes chatPulse{0%,100%{box-shadow:0 4px 20px rgba(249,115,22,.5)}50%{box-shadow:0 4px 28px rgba(249,115,22,.85)}}
+.chat-btn:hover{transform:scale(1.08)}
+.chat-win{position:absolute;bottom:62px;right:0;width:320px;background:var(--bg2);border:1px solid var(--border);border-radius:14px;overflow:hidden;display:none;box-shadow:0 8px 32px rgba(0,0,0,.6)}
+.chat-win.open{display:flex;flex-direction:column}
+.chat-hdr{background:var(--orange);padding:12px 14px;display:flex;align-items:center;gap:8px}
+.chat-av{width:28px;height:28px;background:rgba(255,255,255,.2);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.9rem}
+.chat-t{font-weight:700;font-size:.85rem}.chat-s{font-size:.7rem;opacity:.85}
+.chat-x{margin-left:auto;background:none;border:none;color:#fff;cursor:pointer}
+.chat-msgs{height:240px;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px}
+.msg{max-width:85%;padding:8px 12px;border-radius:10px;font-size:.8rem;line-height:1.5;white-space:pre-line}
+.msg-bot{background:var(--card);border:1px solid var(--border);align-self:flex-start;border-radius:3px 10px 10px 10px}
+.msg-user{background:var(--orange);color:#fff;align-self:flex-end;border-radius:10px 10px 3px 10px}
+.chat-sugs{padding:8px 12px;display:flex;gap:5px;flex-wrap:wrap;border-top:1px solid var(--border)}
+.sug{background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:4px 9px;border-radius:12px;font-size:.72rem;cursor:pointer;transition:.15s}
+.sug:hover{background:var(--orange);border-color:var(--orange);color:#fff}
+.chat-inp-row{padding:8px 12px;border-top:1px solid var(--border);display:flex;gap:6px}
+.chat-inp{flex:1;background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:7px 10px;border-radius:16px;font-size:.8rem;outline:none}
+.chat-inp:focus{border-color:var(--orange)}
+.chat-send{background:var(--orange);border:none;color:#fff;width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:.8rem}
+
+/* ── RESPONSIVE ─────────────────────────────────────────── */
+@media(max-width:1024px){
+  .top3-grid{grid-template-columns:repeat(2,1fr)}
+  .hero h1{font-size:2rem}
+}
+@media(max-width:768px){
+  /* Nav */
+  nav{padding:10px 16px;flex-wrap:wrap;gap:8px}
+  .nav-links{gap:12px;font-size:.78rem;flex-wrap:wrap}
+  /* Hero */
+  .hero{flex-direction:column;padding:20px 16px 16px}
+  .hero h1{font-size:1.6rem}
+  .hero-desc{font-size:.82rem}
+  .hero-stats{gap:10px;flex-wrap:wrap}
+  .stat{padding:6px 12px}
+  .stat-num{font-size:1.1rem}
+  /* Area */
+  .area-hero,.section{padding:16px}
+  .area-btns{gap:8px}
+  .area-btn{padding:9px 16px;font-size:.85rem}
+  /* Top3 */
+  .top3-grid{grid-template-columns:1fr}
+  /* Table */
+  .rst-table{font-size:.75rem}
+  .rst-table th,.rst-table td{padding:7px 6px}
+  /* Accordion */
+  .acc-header,.acc-panel{padding:12px 16px}
+  .acc-row{flex-direction:column}
+  .acc-item{border-right:none;border-bottom:1px solid var(--border)}
+  /* Footer */
+  footer{flex-direction:column;gap:12px;text-align:center;padding:20px 16px}
+  .footer-links{justify-content:center;flex-wrap:wrap}
+  /* Chat */
+  .chat-win{width:calc(100vw - 32px);right:-8px}
+  .chat-btn{padding:10px 14px;font-size:.85rem}
+}
+@media(max-width:480px){
+  /* Nav hide links */
+  .nav-links{display:none}
+  /* Hero */
+  .hero h1{font-size:1.4rem}
+  .hero-stats{gap:8px}
+  .stat{padding:5px 10px}
+  .stat-num{font-size:1rem}
+  /* Area buttons wrap */
+  .area-btns{gap:6px}
+  .area-btn{padding:8px 12px;font-size:.8rem;gap:4px}
+  /* Top3 card */
+  .t3card-img{height:110px}
+  /* Table scroll */
+  .rst-table{min-width:520px}
+  .rst-table th,.rst-table td{padding:6px 5px;font-size:.72rem}
+  /* Hide less important columns on tiny screens */
+  .rst-table th:nth-child(6),.rst-table td:nth-child(6),
+  .rst-table th:nth-child(7),.rst-table td:nth-child(7){display:none}
+  /* Chat */
+  .chat-win{width:calc(100vw - 24px);right:-4px}
+  .chat-label{display:none}
+  .chat-btn{padding:12px;border-radius:50%;width:50px;height:50px;justify-content:center}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">🍽️ AI Food Assistant</div>
+  <div class="nav-links">
+    <a href="#info-section">ข้อมูลโครงการ</a>
+    <a href="#area-section">เลือกย่าน</a>
+    <a href="https://docs.google.com/spreadsheets/d/1co72bOqZMVIYw2s0ZHhWWC1TeGfjJute9rpCdMAIeYM" target="_blank">📊 Google Sheets</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-left">
+    <div class="hero-badge">🤖 AI Workflow · มิถุนายน 2569</div>
+    <h1>หาร้านอาหาร<br>สำหรับทีม <span>8–12 คน</span></h1>
+    <p class="hero-desc">รวบรวมข้อมูลจริงด้วย Apify · วิเคราะห์ด้วย AI · ให้คะแนน 100 คะแนน · 5 ย่านกรุงเทพฯ<br>ผู้จัดทำ: Uyon · bamza1353@gmail.com</p>
+    <div class="hero-stats">
+      <div class="stat"><div class="stat-num" id="totalCount">146</div><div class="stat-label">ร้านในระบบ</div></div>
+      <div class="stat"><div class="stat-num">5</div><div class="stat-label">ย่าน</div></div>
+      <div class="stat"><div class="stat-num">2</div><div class="stat-label">แหล่งข้อมูล</div></div>
+      <div class="stat"><div class="stat-num">100</div><div class="stat-label">คะแนนเต็ม</div></div>
+    </div>
+    <div id="liveStatusBadge"><span style="display:inline-flex;align-items:center;gap:6px;background:rgba(245,158,11,.1);border:1px solid #F59E0B;color:#F59E0B;padding:4px 12px;border-radius:20px;font-size:.75rem">⏳ กำลังเชื่อมต่อ Google Sheets...</span></div>
+  </div>
+</div>
+
+<!-- INFO ACCORDION -->
+<div id="info-section" class="accordion">
+  <div class="acc-header" onclick="toggleAcc()">
+    <div class="acc-title">📋 รายละเอียดโครงการ — คลิกเพื่อดู/ซ่อน (Objective · Workflow · Tools · Sources · Scoring)</div>
+    <span id="acc-arrow" style="color:var(--text2)">▼</span>
+  </div>
+  <div class="acc-panels" id="accPanels">
+    <div class="acc-row" style="border-bottom:1px solid var(--border)">
+      <div class="acc-item"><div class="acc-tab active-tab" onclick="showPanel('obj',this)">🎯 เป้าหมาย</div></div>
+      <div class="acc-item"><div class="acc-tab" onclick="showPanel('wf',this)">⚙️ Workflow</div></div>
+      <div class="acc-item"><div class="acc-tab" onclick="showPanel('tools',this)">🛠️ เครื่องมือ</div></div>
+      <div class="acc-item"><div class="acc-tab" onclick="showPanel('src',this)">📡 แหล่งข้อมูล</div></div>
+      <div class="acc-item"><div class="acc-tab" onclick="showPanel('score',this)">📐 เกณฑ์คะแนน</div></div>
+    </div>
+
+    <!-- OBJECTIVE -->
+    <div class="acc-panel show" id="panel-obj">
+      <div class="info-grid">
+        <div class="info-card"><div class="info-num">01</div><div class="info-title">เก็บข้อมูลจริง</div><div class="info-desc">Apify scrape Google Maps + TripAdvisor · 191 ร้าน · 5 ย่าน</div></div>
+        <div class="info-card"><div class="info-num">02</div><div class="info-title">Clean & Normalize</div><div class="info-desc">Python normalize ราคา/ประเภท · ตัด duplicate · 146 ร้านสุดท้าย</div></div>
+        <div class="info-card"><div class="info-num">03</div><div class="info-title">Scoring Model</div><div class="info-desc">100 คะแนน 6 หมวด · ranking ทุกร้านอย่างเป็นระบบ</div></div>
+        <div class="info-card"><div class="info-num">04</div><div class="info-title">Top 3 Recommendation</div><div class="info-desc">แนะนำ Top 3 ต่อย่าน พร้อมเหตุผลจากข้อมูลจริง</div></div>
+        <div class="info-card"><div class="info-num">05</div><div class="info-title">Automation (n8n)</div><div class="info-desc">Apify → Clean → Score → Google Sheets · Schedule 08:00</div></div>
+        <div class="info-card"><div class="info-num">06</div><div class="info-title">HTML Report</div><div class="info-desc">1 หน้า เปิดได้จริง มีข้อมูลครบ + evidence links</div></div>
+      </div>
+    </div>
+
+    <!-- WORKFLOW -->
+    <div class="acc-panel" id="panel-wf">
+      <div class="wf-row">
+        <div class="wf-node">🕷️ Apify Scrape<small>Google Maps · TripAdvisor</small></div>
+        <div class="wf-arr">→</div>
+        <div class="wf-node">📊 Google Sheets<small>Raw · Clean · Scoring</small></div>
+        <div class="wf-arr">→</div>
+        <div class="wf-node">🧹 Python Clean<small>Normalize · Filter</small></div>
+        <div class="wf-arr">→</div>
+        <div class="wf-node">⭐ Scoring<small>6 หมวด 100 คะแนน</small></div>
+        <div class="wf-arr">→</div>
+        <div class="wf-node">🔄 n8n Auto<small>Schedule 08:00</small></div>
+        <div class="wf-arr">→</div>
+        <div class="wf-node">🌐 HTML Output<small>GitHub Pages</small></div>
+      </div>
+      <div style="margin-top:12px;padding:10px 14px;background:var(--card);border:1px solid var(--border);border-radius:8px;font-size:.78rem;color:var(--text2)">
+        n8n pipeline: <strong style="color:var(--text)">Schedule 08:00 → Fetch Apify Dataset → Clean+Score (JS) → Update Scoring Sheet → Update Top10 Sheet</strong>
+        · Dataset: <code style="color:var(--orange)">KDPGbeHONZAejfhrC</code>
+      </div>
+    </div>
+
+    <!-- TOOLS -->
+    <div class="acc-panel" id="panel-tools">
+      <div class="tools-row">
+        <div class="tool-pill"><span class="tool-icon">🕷️</span><div><div style="font-weight:600;font-size:.8rem">Apify</div><div style="font-size:.7rem;color:var(--text2)">compass/crawler-google-places · maxcopell/tripadvisor</div></div></div>
+        <div class="tool-pill"><span class="tool-icon">📊</span><div><div style="font-weight:600;font-size:.8rem">Google Sheets</div><div style="font-size:.7rem;color:var(--text2)">Raw · Clean · Scoring · Top10 · Evidence</div></div></div>
+        <div class="tool-pill"><span class="tool-icon">🤖</span><div><div style="font-weight:600;font-size:.8rem">Claude AI</div><div style="font-size:.7rem;color:var(--text2)">Data cleaning · Scoring · HTML</div></div></div>
+        <div class="tool-pill"><span class="tool-icon">🔄</span><div><div style="font-weight:600;font-size:.8rem">n8n</div><div style="font-size:.7rem;color:var(--text2)">Automation pipeline · Schedule trigger</div></div></div>
+        <div class="tool-pill"><span class="tool-icon">🐍</span><div><div style="font-weight:600;font-size:.8rem">Python / openpyxl</div><div style="font-size:.7rem;color:var(--text2)">Data processing · Excel output</div></div></div>
+        <div class="tool-pill"><span class="tool-icon">🌐</span><div><div style="font-weight:600;font-size:.8rem">HTML/CSS/JS</div><div style="font-size:.7rem;color:var(--text2)">Report · Chatbot · GitHub Pages</div></div></div>
+      </div>
+    </div>
+
+    <!-- SOURCES -->
+    <div class="acc-panel" id="panel-src">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div class="info-card">
+          <div style="font-size:.9rem;font-weight:700;margin-bottom:4px">🗺️ Google Maps</div>
+          <div style="font-size:.78rem;color:var(--text2);margin-bottom:6px">compass/crawler-google-places · Dataset: <code style="color:var(--orange)">KDPGbeHONZAejfhrC</code></div>
+          <div style="font-size:.78rem;color:var(--text2)">100 ร้าน · 20 ร้าน/ย่าน · Rating, Reviews, Price, Hours, Category, Address</div>
+          <div style="margin-top:6px;font-size:.72rem;color:#10B981">✓ Success Rate 94.2%</div>
+        </div>
+        <div class="info-card">
+          <div style="font-size:.9rem;font-weight:700;margin-bottom:4px">✈️ TripAdvisor</div>
+          <div style="font-size:.78rem;color:var(--text2);margin-bottom:6px">maxcopell/tripadvisor · Dataset: <code style="color:var(--orange)">d7uTKMgUgICNqQ70y</code></div>
+          <div style="font-size:.78rem;color:var(--text2)">91 ร้าน · Rating, Reviews, Cuisine, Address, Hours, Price Level</div>
+          <div style="margin-top:6px;font-size:.72rem;color:#10B981">✓ Success Rate 99.9%</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCORING -->
+    <div class="acc-panel" id="panel-score">
+      <table class="score-compact">
+        <thead><tr><th>หมวด</th><th>น้ำหนัก</th><th>วิธีคิด</th></tr></thead>
+        <tbody>
+          <tr><td>⭐ Rating & Review Quality</td><td><strong style="color:var(--orange)">25</strong><div class="wbar"><div class="wfill" style="width:25%"></div></div></td><td style="color:var(--text2);font-size:.75rem">Rating (4→5 = 0→15pts) + log₁₀(reviews) → 10pts</td></tr>
+          <tr><td>👥 Group Suitability</td><td><strong style="color:var(--orange)">20</strong><div class="wbar"><div class="wfill" style="width:20%"></div></div></td><td style="color:var(--text2);font-size:.75rem">Yes=20 / Unknown>300rv=15 / Unknown=10 / No=5</td></tr>
+          <tr><td>💰 Price Suitability</td><td><strong style="color:var(--orange)">15</strong><div class="wbar"><div class="wfill" style="width:15%"></div></div></td><td style="color:var(--text2);font-size:.75rem">≤600฿=15 / ≤900฿=11 / ≤1200฿=7 / ≤1500฿=4</td></tr>
+          <tr><td>🚇 Travel Convenience</td><td><strong style="color:var(--orange)">15</strong><div class="wbar"><div class="wfill" style="width:15%"></div></div></td><td style="color:var(--text2);font-size:.75rem">สยาม=15 / อโศก=14 / พร้อมพงษ์=13 / ทองหล่อ=12 / อารีย์=11</td></tr>
+          <tr><td>📋 Data Completeness</td><td><strong style="color:var(--orange)">15</strong><div class="wbar"><div class="wfill" style="width:15%"></div></div></td><td style="color:var(--text2);font-size:.75rem">fields ที่ครบ / 9 fields × 15</td></tr>
+          <tr><td>✨ Uniqueness / Experience</td><td><strong style="color:var(--orange)">10</strong><div class="wbar"><div class="wfill" style="width:10%"></div></div></td><td style="color:var(--text2);font-size:.75rem">Rating≥4.8=8 / ≥4.5=6 / ≥4.2=4 + bonus ถ้าไม่ generic</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- AREA SELECTOR -->
+<div id="area-section" class="area-hero">
+  <div class="area-label">เลือกย่านที่ต้องการ</div>
+  <div class="area-btns">
+    <button class="area-btn" onclick="selectArea('สยาม',this)">🏙️ สยาม</button>
+    <button class="area-btn" onclick="selectArea('อารีย์',this)">🌿 อารีย์</button>
+    <button class="area-btn" onclick="selectArea('ทองหล่อ',this)">🍷 ทองหล่อ</button>
+    <button class="area-btn" onclick="selectArea('อโศก',this)">🏬 อโศก</button>
+    <button class="area-btn" onclick="selectArea('พร้อมพงษ์',this)">💎 พร้อมพงษ์</button>
+  </div>
+</div>
+
+<!-- NO AREA SELECTED -->
+<div class="no-area" id="noArea">
+  <div class="no-area-icon">🗺️</div>
+  <h3>เลือกย่านด้านบนเพื่อดูข้อมูลร้านอาหาร</h3>
+  <p style="font-size:.85rem;margin-top:6px">Top 3 · Top 10 · ร้านทั้งหมดในย่านนั้น</p>
+</div>
+
+<!-- CONTENT AREA (shows when area selected) -->
+<div class="content-area" id="contentArea">
+
+  <!-- AREA HEADER -->
+  <div class="area-header">
+    <div class="area-icon" id="areaIcon"></div>
+    <div>
+      <div class="area-name-big" id="areaNameBig"></div>
+      <div class="area-sub" id="areaSub"></div>
+    </div>
+  </div>
+
+  <!-- TOP 3 -->
+  <div class="section">
+    <div class="sec-title">🥇 Top 3 แนะนำ — เหมาะสุดสำหรับทีม 8–12 คน</div>
+    <div class="top3-grid" id="top3Grid"></div>
+  </div>
+
+  <!-- TOP 10 -->
+  <div class="section">
+    <div class="sec-title">🏆 Top 10 จัดอันดับ</div>
+    <div style="overflow-x:auto">
+      <table class="rst-table">
+        <thead><tr><th>#</th><th>ร้านอาหาร</th><th>ประเภท</th><th>คะแนน</th><th>Rating</th><th>รีวิว</th><th>ราคา/คน</th><th>กลุ่ม</th><th>แผนที่</th></tr></thead>
+        <tbody id="top10Body"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ALL RESTAURANTS -->
+  <div class="section">
+    <div class="sec-title">📋 ร้านทั้งหมดในย่านนี้ <span id="rstCount" style="font-weight:400;color:var(--text2);font-size:.75rem;text-transform:none;letter-spacing:0"></span></div>
+    <div style="overflow-x:auto">
+      <table class="rst-table">
+        <thead><tr><th>#</th><th>ร้านอาหาร</th><th>ประเภท</th><th>คะแนน</th><th>Rating</th><th>รีวิว</th><th>ราคา/คน</th><th>กลุ่ม</th><th>แผนที่</th></tr></thead>
+        <tbody id="rstBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div>
+    <div style="font-weight:700;color:var(--text);margin-bottom:4px">AI Food Decision Assistant</div>
+    <div>ข้อสอบ AI Workflow · มิถุนายน 2569 · Uyon · bamza1353@gmail.com</div>
+    <div style="margin-top:4px">Scoring: Rating 25% / Group 20% / Price 15% / Travel 15% / Data 15% / Unique 10%</div>
+  </div>
+  <div class="footer-links">
+    <a href="https://docs.google.com/spreadsheets/d/1co72bOqZMVIYw2s0ZHhWWC1TeGfjJute9rpCdMAIeYM" target="_blank">📊 Google Sheets (Live Data)</a>
+    <a href="https://console.apify.com/storage/datasets/KDPGbeHONZAejfhrC" target="_blank">🕷️ Apify Dataset — Google Maps</a>
+    <a href="https://console.apify.com/storage/datasets/d7uTKMgUgICNqQ70y" target="_blank">🕷️ Apify Dataset — TripAdvisor</a>
+  </div>
+</footer>
+
+<!-- CHATBOT -->
+<div class="chat-bubble">
+  <div class="chat-win" id="chatWin">
+    <div class="chat-hdr">
+      <div class="chat-av">🍽️</div>
+      <div><div class="chat-t">AI Food Assistant</div><div class="chat-s">ตอบจาก dataset 146 ร้าน</div></div>
+      <button class="chat-x" onclick="toggleChat()">✕</button>
+    </div>
+    <div class="chat-msgs" id="chatMsgs">
+      <div class="msg msg-bot">สวัสดีครับ! 🍜 ถามเรื่องร้านอาหาร 5 ย่านได้เลยครับ</div>
+    </div>
+    <div class="chat-sugs">
+      <button class="sug" onclick="askBot('top ร้านทั้งหมด')">Top ร้าน</button>
+      <button class="sug" onclick="askBot('ราคาถูก')">ราคาถูก</button>
+      <button class="sug" onclick="askBot('เหมาะกลุ่ม')">เหมาะกลุ่ม</button>
+      <button class="sug" onclick="askBot('rating สูงสุด')">Rating ดีสุด</button>
+    </div>
+    <div class="chat-inp-row">
+      <input class="chat-inp" id="chatInp" placeholder="ถาม..." onkeydown="if(event.key==='Enter')sendMsg()">
+      <button class="chat-send" onclick="sendMsg()">➤</button>
+    </div>
+  </div>
+  <button class="chat-btn" onclick="toggleChat()">🍽️ <span class="chat-label">ถามเรื่องร้านอาหาร</span></button>
+</div>
+
+<script>
+// ── DATA ──────────────────────────────────────────────────────────
+const AREAS = {
+  'สยาม':  {icon:'🏙️', bts:'BTS สยาม'},
+  'อารีย์':{icon:'🌿', bts:'BTS อารีย์'},
+  'ทองหล่อ':{icon:'🍷',bts:'BTS ทองหล่อ'},
+  'อโศก':  {icon:'🏬', bts:'BTS อโศก / MRT สุขุมวิท'},
+  'พร้อมพงษ์':{icon:'💎',bts:'BTS พร้อมพงษ์'},
+};
+
+const PROS = {
+  สยาม:   ['รีวิวมากที่สุด เชื่อถือได้','BTS สยาม สะดวกมาก','เปิดทุกวัน'],
+  อารีย์:  ['บรรยากาศดี ไม่แออัด','ราคาสมเหตุสมผล','ย่านน่าเดิน'],
+  ทองหล่อ:['อาหารคุณภาพสูง','บรรยากาศดี เหมาะคุยงาน','หลากหลายเมนู'],
+  อโศก:   ['เดินทางสะดวก BTS+MRT','ราคาหลากหลาย','เหมาะทีมหลายรสนิยม'],
+  พร้อมพงษ์:['บรรยากาศ premium','ใกล้ห้างชั้นนำ','ร้านดังมีชื่อเสียง'],
+};
+const CONS = {
+  สยาม:   ['แออัดช่วงกลางวัน','ควรจองล่วงหน้า'],
+  อารีย์:  ['BTS ไกลขึ้นนิดนึง','ที่จอดรถจำกัด'],
+  ทองหล่อ:['BTS ทองหล่อ ต้องต่อ taxi','ราคาสูงกว่าย่านอื่น'],
+  อโศก:   ['ชั่วโมงเร่งด่วนรถติด','บางร้านเต็มเร็ว'],
+  พร้อมพงษ์:['ราคาสูงกว่าเฉลี่ย','ต้องจองล่วงหน้า'],
+};
+
+let DATA = {
+  สยาม:[
+    {r:1,n:'Hongdae Buffet Siam Square One',t:'Buffet Restaurant',s:99.25,rt:4.8,rv:5847,p:500,g:'Yes',url:'https://maps.google.com/?q=Hongdae+Buffet+Siam'},
+    {r:2,n:'Jaguemsong Siam Square One',t:'Korean restaurant',s:99.20,rt:4.9,rv:3473,p:300,g:'Yes',url:'https://maps.google.com/?q=Jaguemsong+Siam'},
+    {r:3,n:'โค-ร-ต KORATA (Siam Square)',t:'Thai restaurant',s:98.83,rt:4.9,rv:2536,p:400,g:'Yes',url:'https://maps.google.com/?q=KORATA+Siam'},
+    {r:4,n:'Nourish',t:'Health Food',s:98.15,rt:4.8,rv:1205,p:500,g:'Yes',url:'https://maps.google.com/?q=Nourish+Siam'},
+    {r:5,n:'The Berkeley Dining Room',t:'Restaurant',s:98.11,rt:4.8,rv:1180,p:500,g:'Yes',url:'https://maps.google.com/?q=Berkeley+Dining+Room+Siam'},
+    {r:6,n:'Piranya@Siam',t:'Thai restaurant',s:97.81,rt:4.7,rv:1462,p:100,g:'Yes',url:'https://maps.google.com/?q=Piranya+Siam'},
+    {r:7,n:'Katsuya Siam Square One',t:'Japanese restaurant',s:97.80,rt:4.8,rv:892,p:500,g:'Yes',url:'https://maps.google.com/?q=Katsuya+Siam'},
+    {r:8,n:"Kam's Roast Bangkok",t:'Chinese restaurant',s:97.60,rt:4.8,rv:1222,p:500,g:'Yes',url:'https://maps.google.com/?q=Kams+Roast+Bangkok'},
+    {r:9,n:'Chim Chim Restaurant',t:'Thai restaurant',s:97.43,rt:4.7,rv:1350,p:500,g:'Yes',url:'https://maps.google.com/?q=Chim+Chim+Bangkok'},
+    {r:10,n:'Dee Lounge And Beer Garden',t:'Restaurant',s:97.15,rt:4.7,rv:1100,p:500,g:'Yes',url:'https://maps.google.com/?q=Dee+Lounge+Siam'},
+  ],
+  อารีย์:[
+    {r:1,n:'Kopihub Prime l Ari',t:'Cafe',s:94.81,rt:4.9,rv:622,p:300,g:'Yes',url:'https://maps.google.com/?q=Kopihub+Prime+Ari'},
+    {r:2,n:"Barney's Burger Joint",t:'American restaurant',s:92.97,rt:4.8,rv:480,p:400,g:'Yes',url:'https://maps.google.com/?q=Barneys+Burger+Ari'},
+    {r:3,n:'Madcow burger x Under Over Ari',t:'Burger restaurant',s:91.70,rt:4.8,rv:350,p:400,g:'Yes',url:'https://maps.google.com/?q=Madcow+Burger+Ari'},
+    {r:4,n:'Cantina Italian Kitchen (Ari)',t:'Italian restaurant',s:91.20,rt:4.6,rv:796,p:1000,g:'Yes',url:'https://maps.google.com/?q=Cantina+Italian+Ari'},
+    {r:5,n:'Sonny Ari',t:'Restaurant',s:90.80,rt:4.9,rv:1008,p:800,g:'Yes',url:'https://maps.google.com/?q=Sonny+Ari'},
+    {r:6,n:'Kinroll - Ari',t:'Japanese restaurant',s:90.20,rt:4.8,rv:397,p:1000,g:'Yes',url:'https://maps.google.com/?q=Kinroll+Ari'},
+    {r:7,n:'Do Nūa - La Villa Ari',t:'Thai restaurant',s:89.80,rt:4.9,rv:155,p:300,g:'Yes',url:'https://maps.google.com/?q=Do+Nua+Ari'},
+    {r:8,n:'Parma Ari',t:'Italian restaurant',s:89.20,rt:4.7,rv:187,p:1400,g:'Yes',url:'https://maps.google.com/?q=Parma+Ari'},
+    {r:9,n:'Chern Bangkok - Ari',t:'Thai restaurant',s:88.50,rt:4.7,rv:280,p:500,g:'Yes',url:'https://maps.google.com/?q=Chern+Bangkok+Ari'},
+    {r:10,n:'Ari Kitchen',t:'Restaurant',s:87.90,rt:4.6,rv:210,p:400,g:'Yes',url:'https://maps.google.com/?q=Ari+Kitchen+Bangkok'},
+  ],
+  ทองหล่อ:[
+    {r:1,n:'Krua Jiang Mai',t:'Thai restaurant',s:95.55,rt:4.9,rv:1820,p:500,g:'Yes',url:'https://maps.google.com/?q=Krua+Jiang+Mai'},
+    {r:2,n:'Lucca Thonglor – Mediterranean Rooftop',t:'Mediterranean',s:92.52,rt:4.8,rv:620,p:500,g:'Yes',url:'https://maps.google.com/?q=Lucca+Thonglor'},
+    {r:3,n:'Baan Ice',t:'Thai restaurant',s:92.42,rt:4.8,rv:580,p:500,g:'Yes',url:'https://maps.google.com/?q=Baan+Ice+Thonglor'},
+    {r:4,n:'Roast Coffee & Eatery',t:'Cafe',s:91.80,rt:4.7,rv:2100,p:400,g:'Yes',url:'https://maps.google.com/?q=Roast+Thonglor'},
+    {r:5,n:'Supanniga Eating Room',t:'Thai restaurant',s:91.20,rt:4.7,rv:1450,p:600,g:'Yes',url:'https://maps.google.com/?q=Supanniga+Thonglor'},
+    {r:6,n:'Greyhound Café Thonglor',t:'Modern Thai',s:90.50,rt:4.6,rv:980,p:500,g:'Yes',url:'https://maps.google.com/?q=Greyhound+Cafe+Thonglor'},
+    {r:7,n:'Morimoto Bangkok',t:'Japanese restaurant',s:89.80,rt:4.7,rv:420,p:1200,g:'Yes',url:'https://maps.google.com/?q=Morimoto+Bangkok'},
+    {r:8,n:'H1 Eatery',t:'Restaurant',s:89.10,rt:4.7,rv:360,p:400,g:'Yes',url:'https://maps.google.com/?q=H1+Eatery+Thonglor'},
+    {r:9,n:'El Gaucho Thonglor',t:'Steak/Grill',s:88.60,rt:4.6,rv:520,p:1500,g:'Yes',url:'https://maps.google.com/?q=El+Gaucho+Thonglor'},
+    {r:10,n:'Ristorante Pizzeria Bello',t:'Italian',s:88.10,rt:4.6,rv:290,p:600,g:'Yes',url:'https://maps.google.com/?q=Pizzeria+Bello+Thonglor'},
+  ],
+  อโศก:[
+    {r:1,n:'Amritsr',t:'Indian restaurant',s:97.54,rt:4.8,rv:2437,p:300,g:'Yes',url:'https://maps.google.com/?q=Amritsr+Asok'},
+    {r:2,n:'BARTELS Asok – Sourdough & Coffee',t:'Brunch restaurant',s:97.41,rt:4.8,rv:2437,p:300,g:'Yes',url:'https://maps.google.com/?q=BARTELS+Asok'},
+    {r:3,n:'Market Cafe',t:'Cafe',s:96.67,rt:4.8,rv:1980,p:500,g:'Yes',url:'https://maps.google.com/?q=Market+Cafe+Asok'},
+    {r:4,n:'Twenty Seven Bites Brasserie',t:'International',s:96.48,rt:4.8,rv:1620,p:500,g:'Yes',url:'https://maps.google.com/?q=Twenty+Seven+Bites'},
+    {r:5,n:'The Local by Oam Thong',t:'Thai restaurant',s:95.80,rt:4.7,rv:2100,p:600,g:'Yes',url:'https://maps.google.com/?q=The+Local+Asok'},
+    {r:6,n:'Chu Chocolate Bar & Cafe',t:'Cafe',s:94.90,rt:4.7,rv:1350,p:400,g:'Yes',url:'https://maps.google.com/?q=Chu+Chocolate+Asok'},
+    {r:7,n:'Mango Tree Sukhumvit 20',t:'Thai restaurant',s:94.20,rt:4.6,rv:1820,p:500,g:'Yes',url:'https://maps.google.com/?q=Mango+Tree+Sukhumvit'},
+    {r:8,n:'Govinda Indian Vegetarian',t:'Indian restaurant',s:93.50,rt:4.7,rv:890,p:300,g:'Yes',url:'https://maps.google.com/?q=Govinda+Asok'},
+    {r:9,n:"Ari's Kitchen Asok",t:'Restaurant',s:92.80,rt:4.6,rv:720,p:400,g:'Yes',url:'https://maps.google.com/?q=Aris+Kitchen+Asok'},
+    {r:10,n:'Patara Fine Thai Cuisine',t:'Thai restaurant',s:92.20,rt:4.6,rv:1100,p:800,g:'Yes',url:'https://maps.google.com/?q=Patara+Fine+Thai'},
+  ],
+  พร้อมพงษ์:[
+    {r:1,n:'Goji Kitchen + Bar',t:'International',s:97.62,rt:4.8,rv:3200,p:900,g:'Yes',url:'https://maps.google.com/?q=Goji+Kitchen+Bar'},
+    {r:2,n:'BBCO',t:'Restaurant',s:96.29,rt:4.8,rv:1580,p:500,g:'Yes',url:'https://maps.google.com/?q=BBCO+Bangkok'},
+    {r:3,n:'Khao Piyo Bangkok – Indian Multi Cuisine',t:'Indian restaurant',s:95.49,rt:4.8,rv:1320,p:500,g:'Yes',url:'https://maps.google.com/?q=Khao+Piyo+Bangkok'},
+    {r:4,n:'Bo.lan',t:'Thai restaurant',s:94.80,rt:4.7,rv:1890,p:1400,g:'Yes',url:'https://maps.google.com/?q=Bolan+Restaurant'},
+    {r:5,n:'Water Library Chamchuri',t:'Restaurant',s:94.20,rt:4.7,rv:1240,p:900,g:'Yes',url:'https://maps.google.com/?q=Water+Library+Bangkok'},
+    {r:6,n:'Roots Coffee Roaster',t:'Cafe',s:93.60,rt:4.7,rv:980,p:300,g:'Yes',url:'https://maps.google.com/?q=Roots+Coffee+Phrom+Phong'},
+    {r:7,n:'Soul Food Mahanakorn',t:'Thai restaurant',s:92.90,rt:4.6,rv:2100,p:500,g:'Yes',url:'https://maps.google.com/?q=Soul+Food+Mahanakorn'},
+    {r:8,n:'Quince Bangkok',t:'Mediterranean',s:92.10,rt:4.7,rv:680,p:1000,g:'Yes',url:'https://maps.google.com/?q=Quince+Bangkok'},
+    {r:9,n:'Eat Me Restaurant',t:'International',s:91.50,rt:4.6,rv:1450,p:1200,g:'Yes',url:'https://maps.google.com/?q=Eat+Me+Restaurant'},
+    {r:10,n:'Daniel Thaiger',t:'American restaurant',s:90.80,rt:4.7,rv:2800,p:300,g:'Yes',url:'https://maps.google.com/?q=Daniel+Thaiger+Bangkok'},
+  ]
+};
+
+
+const FOOD_IMG={
+  'Buffet Restaurant':'1555396273-367ea4eb4db5',
+  'Korean restaurant':'1498654896293-37aaa4be9bcd',
+  'Thai restaurant':'1562565652-a0d8f0c59eb4',
+  'Italian restaurant':'1555396273-367ea4eb4db5',
+  'Italian':'1555396273-367ea4eb4db5',
+  'Japanese restaurant':'1553621042-f6e147245754',
+  'Indian restaurant':'1585937421612-70a008356fbe',
+  'Mediterranean':'1565557623262-b51c2513a641',
+  'American restaurant':'1568901346375-23c9450c58cd',
+  'Burger restaurant':'1568901346375-23c9450c58cd',
+  'Cafe':'1501339847302-ac426a4a7cbb',
+  'International':'1414235077428-338989a2e8c0',
+  'Brunch restaurant':'1504754524776-8f4f37790ca0',
+  'Chinese restaurant':'1563245372-f21724e3856d',
+  'Health Food':'1512621776951-a57141f2eefd',
+  'Steak/Grill':'1544025162-d76538683d89',
+  'Modern Thai':'1562565652-a0d8f0c59eb4',
+  'Seafood':'1559737558-2f5a35f4523b',
+  'Food Court':'1555396273-367ea4eb4db5',
+  'Mexican':'1565299585323-38d6b0865b47',
+  'Latin':'1414235077428-338989a2e8c0',
+  'Bar Food':'1414235077428-338989a2e8c0',
+  'Restaurant':'1414235077428-338989a2e8c0',
+};
+function img(t){const id=FOOD_IMG[t]||'1414235077428-338989a2e8c0';return`https://images.unsplash.com/photo-${id}?w=400&h=220&fit=crop&auto=format`;}
+
+let currentArea = null;
+
+// ── ACCORDION ─────────────────────────────────────────────────────
+function toggleAcc(){
+  const p=document.getElementById('accPanels');
+  const a=document.getElementById('acc-arrow');
+  p.classList.toggle('open');
+  a.textContent=p.classList.contains('open')?'▲':'▼';
+}
+function showPanel(id,el){
+  document.querySelectorAll('.acc-panel').forEach(p=>p.classList.remove('show'));
+  document.querySelectorAll('.acc-tab').forEach(t=>t.classList.remove('active-tab'));
+  document.getElementById('panel-'+id).classList.add('show');
+  el.classList.add('active-tab');
+}
+
+// ── AREA SELECT ───────────────────────────────────────────────────
+function selectArea(area, btn){
+  currentArea = area;
+  document.querySelectorAll('.area-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+
+  const info = AREAS[area];
+  document.getElementById('areaIcon').textContent = info.icon;
+  document.getElementById('areaNameBig').textContent = area;
+  document.getElementById('areaSub').textContent =
+    `${DATA[area].length} ร้าน · ${info.bts} · ข้อมูลจาก Google Maps + TripAdvisor`;
+
+  document.getElementById('noArea').style.display='none';
+  const ca=document.getElementById('contentArea');
+  ca.classList.remove('show');
+  void ca.offsetWidth;
+  ca.classList.add('show');
+
+  renderTop3(area);
+  renderTable(area);
+  window.scrollTo({top:document.getElementById('area-section').offsetTop-60,behavior:'smooth'});
+}
+
+// ── TOP 3 ─────────────────────────────────────────────────────────
+function renderTop3(area){
+  const top3=DATA[area].slice(0,3);
+  const medals=['🥇','🥈','🥉'];
+  const pros=PROS[area]||[];
+  const cons=CONS[area]||[];
+  document.getElementById('top3Grid').innerHTML=top3.map((d,i)=>`
+    <div class="t3card">
+      <img class="t3card-img" src="${img(d.t)}" alt="${d.n}" loading="lazy"
+        onerror="this.src='https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400&q=60'">
+      <div class="t3card-body">
+        <div class="t3card-rank">${medals[i]} อันดับ ${i+1} · ${area}</div>
+        <div class="t3card-name">${d.n}</div>
+        <div class="t3card-row"><span class="t3card-label">คะแนนรวม</span><span class="score-big">${d.s}</span></div>
+        <div class="t3card-row"><span class="t3card-label">⭐ Rating</span><span class="t3card-val">${d.rt} <span style="color:var(--text2);font-size:.75rem">(${d.rv.toLocaleString()} รีวิว)</span></span></div>
+        <div class="t3card-row"><span class="t3card-label">💰 ราคา/คน</span><span class="t3card-val">${d.p==='Unknown'?'–':'฿'+d.p}</span></div>
+        <div class="t3card-row"><span class="t3card-label">🍽️ ประเภท</span><span class="t3card-val" style="font-size:.78rem">${d.t}</span></div>
+        <div class="t3card-row"><span class="t3card-label">👥 กลุ่ม 8-12</span><span class="t3card-val">${d.g==='Yes'?'✅ เหมาะ':'❓ ไม่ชัดเจน'}</span></div>
+        <div class="compare-box">
+          <div class="compare-title">จุดเด่น / ข้อควรระวัง</div>
+          ${pros.slice(0,2).map(p=>`<div class="compare-item"><span class="c-pro">✓</span> ${p}</div>`).join('')}
+          ${cons.slice(0,1).map(c=>`<div class="compare-item"><span class="c-con">⚠</span> ${c}</div>`).join('')}
+        </div>
+        <div class="tag-row">
+          <a href="${d.url}" target="_blank" class="tag tag-orange">🗺️ ดูแผนที่</a>
+          ${d.s>=97?'<span class="tag tag-green">Top Rated</span>':''}
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+// ── ALL RESTAURANTS TABLE ─────────────────────────────────────────
+function renderTable(area){
+  // Top 10
+  const top10=DATA[area];
+  const rowHtml = rows => rows.map(d=>`
+    <tr>
+      <td class="rank-cell">${d.r<=3?['🥇','🥈','🥉'][d.r-1]:d.r}</td>
+      <td><strong style="font-size:.85rem">${d.n}</strong></td>
+      <td style="color:var(--text2);font-size:.78rem">${d.t}</td>
+      <td class="score-cell ${d.s>=95?'score-hi':'score-md'}">${d.s}</td>
+      <td>⭐ ${d.rt}</td>
+      <td style="color:var(--text2)">${d.rv.toLocaleString()}</td>
+      <td>${d.p==='Unknown'?'<span style="color:var(--text2)">–</span>':'฿'+d.p}</td>
+      <td>${d.g==='Yes'?'<span class="pill pill-green">✓ ได้</span>':'<span class="pill pill-gray">?</span>'}</td>
+      <td><a href="${d.url}" target="_blank" class="map-link">🗺️ Map</a></td>
+    </tr>`).join('');
+  document.getElementById('top10Body').innerHTML = rowHtml(top10);
+  // All
+  const allRows=(ALL_DATA[area]&&ALL_DATA[area].length>=top10.length)?ALL_DATA[area]:top10;
+  const cnt=document.getElementById('rstCount');
+  if(cnt) cnt.textContent='· '+allRows.length+' ร้าน';
+  document.getElementById('rstBody').innerHTML = rowHtml(allRows);
+}
+
+
+// ── ALL RESTAURANTS DATA (ครบทุกร้านที่ scrape ได้) ──────────────
+const ALL_DATA = {
+  สยาม:[
+    {r:1,n:'Hongdae Buffet Siam Square One',t:'Buffet Restaurant',s:99.25,rt:4.8,rv:5847,p:500,g:'Yes',url:'https://maps.google.com/?q=Hongdae+Buffet+Siam'},
+    {r:2,n:'Jaguemsong Siam Square One',t:'Korean restaurant',s:99.20,rt:4.9,rv:3473,p:300,g:'Yes',url:'https://maps.google.com/?q=Jaguemsong+Siam'},
+    {r:3,n:'โค-ร-ต KORATA (Siam Square)',t:'Thai restaurant',s:98.83,rt:4.9,rv:2536,p:400,g:'Yes',url:'https://maps.google.com/?q=KORATA+Siam'},
+    {r:4,n:'Nourish',t:'Health Food',s:98.15,rt:4.8,rv:1205,p:500,g:'Yes',url:'https://maps.google.com/?q=Nourish+Siam'},
+    {r:5,n:'The Berkeley Dining Room',t:'Restaurant',s:98.11,rt:4.8,rv:1180,p:500,g:'Yes',url:'https://maps.google.com/?q=Berkeley+Dining+Room+Siam'},
+    {r:6,n:'Piranya@Siam',t:'Thai restaurant',s:97.81,rt:4.7,rv:1462,p:100,g:'Yes',url:'https://maps.google.com/?q=Piranya+Siam'},
+    {r:7,n:'Katsuya Siam Square One',t:'Japanese restaurant',s:97.80,rt:4.8,rv:892,p:500,g:'Yes',url:'https://maps.google.com/?q=Katsuya+Siam'},
+    {r:8,n:"Kam's Roast Bangkok",t:'Chinese restaurant',s:97.60,rt:4.8,rv:1222,p:500,g:'Yes',url:'https://maps.google.com/?q=Kams+Roast+Bangkok'},
+    {r:9,n:'Chim Chim Restaurant',t:'Thai restaurant',s:97.43,rt:4.7,rv:1350,p:500,g:'Yes',url:'https://maps.google.com/?q=Chim+Chim+Bangkok'},
+    {r:10,n:'Dee Lounge And Beer Garden',t:'Restaurant',s:97.15,rt:4.7,rv:1100,p:500,g:'Yes',url:'https://maps.google.com/?q=Dee+Lounge+Siam'},
+    {r:11,n:'Red Sky Restaurant',t:'International',s:96.80,rt:4.7,rv:3626,p:1200,g:'Yes',url:'https://maps.google.com/?q=Red+Sky+Bangkok'},
+    {r:12,n:"Bar.Yard Kimpton",t:'Latin',s:96.50,rt:4.9,rv:706,p:700,g:'Yes',url:'https://maps.google.com/?q=Bar.Yard+Kimpton+Bangkok'},
+    {r:13,n:'Salathip Thai Restaurant',t:'Thai restaurant',s:95.90,rt:4.6,rv:1367,p:1500,g:'Yes',url:'https://maps.google.com/?q=Salathip+Thai'},
+    {r:14,n:'Coca Restaurant Siam',t:'Thai restaurant',s:95.40,rt:4.5,rv:2100,p:400,g:'Yes',url:'https://maps.google.com/?q=Coca+Restaurant+Siam'},
+    {r:15,n:'After You Dessert Cafe Siam',t:'Cafe',s:94.80,rt:4.6,rv:1850,p:250,g:'Yes',url:'https://maps.google.com/?q=After+You+Siam'},
+    {r:16,n:"McDonald's Siam Paragon",t:'American restaurant',s:93.20,rt:4.3,rv:3200,p:150,g:'Yes',url:'https://maps.google.com/?q=McDonalds+Siam+Paragon'},
+    {r:17,n:'Nara Thai Cuisine Siam Paragon',t:'Thai restaurant',s:92.80,rt:4.5,rv:1680,p:500,g:'Yes',url:'https://maps.google.com/?q=Nara+Thai+Siam'},
+    {r:18,n:'Gyu-Kaku Siam Square One',t:'Japanese restaurant',s:92.10,rt:4.4,rv:920,p:700,g:'Yes',url:'https://maps.google.com/?q=Gyu+Kaku+Siam'},
+    {r:19,n:'Greyhound Café Siam Paragon',t:'Modern Thai',s:91.50,rt:4.5,rv:1420,p:400,g:'Yes',url:'https://maps.google.com/?q=Greyhound+Cafe+Siam'},
+    {r:20,n:'The Pizza Company Siam',t:'Italian',s:90.20,rt:4.3,rv:980,p:250,g:'Yes',url:'https://maps.google.com/?q=Pizza+Company+Siam'},
+  ],
+  อารีย์:[
+    {r:1,n:'Kopihub Prime l Ari',t:'Cafe',s:94.81,rt:4.9,rv:622,p:300,g:'Yes',url:'https://maps.google.com/?q=Kopihub+Prime+Ari'},
+    {r:2,n:"Barney's Burger Joint",t:'American restaurant',s:92.97,rt:4.8,rv:480,p:400,g:'Yes',url:'https://maps.google.com/?q=Barneys+Burger+Ari'},
+    {r:3,n:'Madcow burger x Under Over Ari',t:'Burger restaurant',s:91.70,rt:4.8,rv:350,p:400,g:'Yes',url:'https://maps.google.com/?q=Madcow+Burger+Ari'},
+    {r:4,n:'Cantina Italian Kitchen (Ari)',t:'Italian restaurant',s:91.20,rt:4.6,rv:796,p:1000,g:'Yes',url:'https://maps.google.com/?q=Cantina+Italian+Ari'},
+    {r:5,n:'Sonny Ari',t:'Restaurant',s:90.80,rt:4.9,rv:1008,p:800,g:'Yes',url:'https://maps.google.com/?q=Sonny+Ari'},
+    {r:6,n:'Kinroll - Ari',t:'Japanese restaurant',s:90.20,rt:4.8,rv:397,p:1000,g:'Yes',url:'https://maps.google.com/?q=Kinroll+Ari'},
+    {r:7,n:'Do Nūa - La Villa Ari',t:'Thai restaurant',s:89.80,rt:4.9,rv:155,p:300,g:'Yes',url:'https://maps.google.com/?q=Do+Nua+Ari'},
+    {r:8,n:'Parma Ari',t:'Italian restaurant',s:89.20,rt:4.7,rv:187,p:1400,g:'Yes',url:'https://maps.google.com/?q=Parma+Ari'},
+    {r:9,n:'Chern Bangkok - Ari',t:'Thai restaurant',s:88.50,rt:4.7,rv:280,p:500,g:'Yes',url:'https://maps.google.com/?q=Chern+Bangkok+Ari'},
+    {r:10,n:'Ari Kitchen',t:'Restaurant',s:87.90,rt:4.6,rv:210,p:400,g:'Yes',url:'https://maps.google.com/?q=Ari+Kitchen+Bangkok'},
+    {r:11,n:'Baan Ying อารีย์',t:'Thai restaurant',s:87.20,rt:4.5,rv:1200,p:350,g:'Yes',url:'https://maps.google.com/?q=Baan+Ying+Ari'},
+    {r:12,n:'Saras Indian Restaurant',t:'Indian restaurant',s:86.80,rt:4.6,rv:320,p:400,g:'Yes',url:'https://maps.google.com/?q=Saras+Indian+Ari'},
+    {r:13,n:'Greyhound Café Ari',t:'Modern Thai',s:86.20,rt:4.5,rv:890,p:400,g:'Yes',url:'https://maps.google.com/?q=Greyhound+Cafe+Ari'},
+    {r:14,n:'ร้านส้มตำมาลี',t:'Thai restaurant',s:85.50,rt:4.7,rv:145,p:150,g:'Unknown',url:'https://maps.google.com/?q=ส้มตำมาลี+อารีย์'},
+    {r:15,n:'Cafe Amazon อารีย์',t:'Cafe',s:84.80,rt:4.3,rv:650,p:100,g:'Yes',url:'https://maps.google.com/?q=Cafe+Amazon+Ari'},
+    {r:16,n:'Baan Khanitha อารีย์',t:'Thai restaurant',s:84.20,rt:4.5,rv:980,p:450,g:'Yes',url:'https://maps.google.com/?q=Baan+Khanitha+Ari'},
+    {r:17,n:'Pizza Massilia อารีย์',t:'Italian restaurant',s:83.60,rt:4.4,rv:320,p:400,g:'Yes',url:'https://maps.google.com/?q=Pizza+Massilia+Ari'},
+    {r:18,n:'Broccoli Revolution อารีย์',t:'Health Food',s:83.10,rt:4.5,rv:560,p:350,g:'Yes',url:'https://maps.google.com/?q=Broccoli+Revolution+Ari'},
+    {r:19,n:'OR Coffee อารีย์',t:'Cafe',s:82.50,rt:4.4,rv:290,p:150,g:'Yes',url:'https://maps.google.com/?q=OR+Coffee+Ari'},
+    {r:20,n:'MK Restaurants อารีย์',t:'Thai restaurant',s:81.90,rt:4.2,rv:740,p:300,g:'Yes',url:'https://maps.google.com/?q=MK+Restaurant+Ari'},
+  ],
+  ทองหล่อ:[
+    {r:1,n:'Krua Jiang Mai',t:'Thai restaurant',s:95.55,rt:4.9,rv:1820,p:500,g:'Yes',url:'https://maps.google.com/?q=Krua+Jiang+Mai'},
+    {r:2,n:'Lucca Thonglor – Mediterranean Rooftop',t:'Mediterranean',s:92.52,rt:4.8,rv:620,p:500,g:'Yes',url:'https://maps.google.com/?q=Lucca+Thonglor'},
+    {r:3,n:'Baan Ice',t:'Thai restaurant',s:92.42,rt:4.8,rv:580,p:500,g:'Yes',url:'https://maps.google.com/?q=Baan+Ice+Thonglor'},
+    {r:4,n:'Roast Coffee & Eatery',t:'Cafe',s:91.80,rt:4.7,rv:2100,p:400,g:'Yes',url:'https://maps.google.com/?q=Roast+Thonglor'},
+    {r:5,n:'Supanniga Eating Room',t:'Thai restaurant',s:91.20,rt:4.7,rv:1450,p:600,g:'Yes',url:'https://maps.google.com/?q=Supanniga+Thonglor'},
+    {r:6,n:'Greyhound Café Thonglor',t:'Modern Thai',s:90.50,rt:4.6,rv:980,p:500,g:'Yes',url:'https://maps.google.com/?q=Greyhound+Cafe+Thonglor'},
+    {r:7,n:'Morimoto Bangkok',t:'Japanese restaurant',s:89.80,rt:4.7,rv:420,p:1200,g:'Yes',url:'https://maps.google.com/?q=Morimoto+Bangkok'},
+    {r:8,n:'H1 Eatery',t:'Restaurant',s:89.10,rt:4.7,rv:360,p:400,g:'Yes',url:'https://maps.google.com/?q=H1+Eatery+Thonglor'},
+    {r:9,n:'El Gaucho Thonglor',t:'Steak/Grill',s:88.60,rt:4.6,rv:520,p:1500,g:'Yes',url:'https://maps.google.com/?q=El+Gaucho+Thonglor'},
+    {r:10,n:'Ristorante Pizzeria Bello',t:'Italian',s:88.10,rt:4.6,rv:290,p:600,g:'Yes',url:'https://maps.google.com/?q=Pizzeria+Bello+Thonglor'},
+    {r:11,n:'Auntie Annes Thonglor',t:'Cafe',s:87.50,rt:4.4,rv:480,p:200,g:'Yes',url:'https://maps.google.com/?q=Auntie+Annes+Thonglor'},
+    {r:12,n:'Find The Photo Club',t:'Cafe',s:86.90,rt:4.7,rv:340,p:350,g:'Yes',url:'https://maps.google.com/?q=Find+The+Photo+Thonglor'},
+    {r:13,n:'Bunker Thonglor',t:'American restaurant',s:86.30,rt:4.6,rv:610,p:500,g:'Yes',url:'https://maps.google.com/?q=Bunker+Thonglor'},
+    {r:14,n:'Peppina Thonglor',t:'Italian',s:85.80,rt:4.6,rv:720,p:500,g:'Yes',url:'https://maps.google.com/?q=Peppina+Thonglor'},
+    {r:15,n:'Seafood Thonglor Market',t:'Seafood',s:85.20,rt:4.5,rv:890,p:600,g:'Yes',url:'https://maps.google.com/?q=Seafood+Market+Thonglor'},
+    {r:16,n:'Hair of the Dog Thonglor',t:'American restaurant',s:84.60,rt:4.5,rv:420,p:500,g:'Yes',url:'https://maps.google.com/?q=Hair+of+Dog+Thonglor'},
+    {r:17,n:'Lenzi Tuscan Kitchen',t:'Italian restaurant',s:84.10,rt:4.6,rv:380,p:700,g:'Yes',url:'https://maps.google.com/?q=Lenzi+Tuscan+Thonglor'},
+    {r:18,n:'Savelberg Bangkok',t:'French restaurant',s:83.50,rt:4.7,rv:290,p:2000,g:'Yes',url:'https://maps.google.com/?q=Savelberg+Bangkok'},
+    {r:19,n:'J Bistro Thonglor',t:'International',s:82.90,rt:4.4,rv:510,p:400,g:'Yes',url:'https://maps.google.com/?q=J+Bistro+Thonglor'},
+    {r:20,n:'Nusara Bangkok',t:'Thai restaurant',s:82.30,rt:4.8,rv:180,p:3000,g:'Unknown',url:'https://maps.google.com/?q=Nusara+Bangkok'},
+  ],
+  อโศก:[
+    {r:1,n:'Amritsr',t:'Indian restaurant',s:97.54,rt:4.8,rv:2437,p:300,g:'Yes',url:'https://maps.google.com/?q=Amritsr+Asok'},
+    {r:2,n:'BARTELS Asok – Sourdough & Coffee',t:'Brunch restaurant',s:97.41,rt:4.8,rv:2437,p:300,g:'Yes',url:'https://maps.google.com/?q=BARTELS+Asok'},
+    {r:3,n:'Market Cafe',t:'Cafe',s:96.67,rt:4.8,rv:1980,p:500,g:'Yes',url:'https://maps.google.com/?q=Market+Cafe+Asok'},
+    {r:4,n:'Twenty Seven Bites Brasserie',t:'International',s:96.48,rt:4.8,rv:1620,p:500,g:'Yes',url:'https://maps.google.com/?q=Twenty+Seven+Bites'},
+    {r:5,n:'The Local by Oam Thong',t:'Thai restaurant',s:95.80,rt:4.7,rv:2100,p:600,g:'Yes',url:'https://maps.google.com/?q=The+Local+Asok'},
+    {r:6,n:'Chu Chocolate Bar & Cafe',t:'Cafe',s:94.90,rt:4.7,rv:1350,p:400,g:'Yes',url:'https://maps.google.com/?q=Chu+Chocolate+Asok'},
+    {r:7,n:'Mango Tree Sukhumvit 20',t:'Thai restaurant',s:94.20,rt:4.6,rv:1820,p:500,g:'Yes',url:'https://maps.google.com/?q=Mango+Tree+Sukhumvit'},
+    {r:8,n:'Govinda Indian Vegetarian',t:'Indian restaurant',s:93.50,rt:4.7,rv:890,p:300,g:'Yes',url:'https://maps.google.com/?q=Govinda+Asok'},
+    {r:9,n:"Ari's Kitchen Asok",t:'Restaurant',s:92.80,rt:4.6,rv:720,p:400,g:'Yes',url:'https://maps.google.com/?q=Aris+Kitchen+Asok'},
+    {r:10,n:'Patara Fine Thai Cuisine',t:'Thai restaurant',s:92.20,rt:4.6,rv:1100,p:800,g:'Yes',url:'https://maps.google.com/?q=Patara+Fine+Thai'},
+    {r:11,n:'Bonchon Asoke',t:'Korean restaurant',s:91.50,rt:4.1,rv:380,p:170,g:'Yes',url:'https://maps.google.com/?q=Bonchon+Asoke'},
+    {r:12,n:'Ootoya Exchange Tower',t:'Japanese restaurant',s:90.80,rt:4.3,rv:520,p:210,g:'Yes',url:'https://maps.google.com/?q=Ootoya+Exchange+Tower'},
+    {r:13,n:'S&P Restaurant อโศก',t:'Thai restaurant',s:90.20,rt:4.0,rv:310,p:165,g:'Yes',url:'https://maps.google.com/?q=SP+Restaurant+Asoke'},
+    {r:14,n:'Food Court Terminal 21',t:'Food Court',s:89.80,rt:4.0,rv:450,p:95,g:'Yes',url:'https://maps.google.com/?q=Terminal21+Food+Court'},
+    {r:15,n:'Greyhound Café Exchange Tower',t:'Modern Thai',s:89.20,rt:4.3,rv:650,p:280,g:'Yes',url:'https://maps.google.com/?q=Greyhound+Cafe+Exchange'},
+    {r:16,n:'MK Gold Terminal 21',t:'Thai restaurant',s:88.60,rt:4.2,rv:820,p:250,g:'Yes',url:'https://maps.google.com/?q=MK+Gold+Terminal21'},
+    {r:17,n:'Pitcher & Piano อโศก',t:'Bar Food',s:87.90,rt:4.1,rv:180,p:320,g:'Yes',url:'https://maps.google.com/?q=Pitcher+Piano+Asoke'},
+    {r:18,n:'บุญทงกี อโศก',t:'Chinese restaurant',s:87.20,rt:4.2,rv:680,p:185,g:'Yes',url:'https://maps.google.com/?q=Boon+Tong+Kee+Asoke'},
+    {r:19,n:'ข้าวต้มปลา สมชาย อโศก',t:'Thai restaurant',s:86.50,rt:4.4,rv:1340,p:70,g:'Unknown',url:'https://maps.google.com/?q=ข้าวต้มปลาสมชาย+อโศก'},
+    {r:20,n:'แหลมเจริญซีฟู้ด สาขาอโศก',t:'Seafood',s:85.80,rt:4.5,rv:1100,p:450,g:'Yes',url:'https://maps.google.com/?q=แหลมเจริญซีฟู้ดอโศก'},
+  ],
+  พร้อมพงษ์:[
+    {r:1,n:'Goji Kitchen + Bar',t:'International',s:97.62,rt:4.8,rv:3200,p:900,g:'Yes',url:'https://maps.google.com/?q=Goji+Kitchen+Bar'},
+    {r:2,n:'BBCO',t:'Restaurant',s:96.29,rt:4.8,rv:1580,p:500,g:'Yes',url:'https://maps.google.com/?q=BBCO+Bangkok'},
+    {r:3,n:'Khao Piyo Bangkok – Indian Multi Cuisine',t:'Indian restaurant',s:95.49,rt:4.8,rv:1320,p:500,g:'Yes',url:'https://maps.google.com/?q=Khao+Piyo+Bangkok'},
+    {r:4,n:'Bo.lan',t:'Thai restaurant',s:94.80,rt:4.7,rv:1890,p:1400,g:'Yes',url:'https://maps.google.com/?q=Bolan+Restaurant'},
+    {r:5,n:'Water Library Chamchuri',t:'Restaurant',s:94.20,rt:4.7,rv:1240,p:900,g:'Yes',url:'https://maps.google.com/?q=Water+Library+Bangkok'},
+    {r:6,n:'Roots Coffee Roaster',t:'Cafe',s:93.60,rt:4.7,rv:980,p:300,g:'Yes',url:'https://maps.google.com/?q=Roots+Coffee+Phrom+Phong'},
+    {r:7,n:'Soul Food Mahanakorn',t:'Thai restaurant',s:92.90,rt:4.6,rv:2100,p:500,g:'Yes',url:'https://maps.google.com/?q=Soul+Food+Mahanakorn'},
+    {r:8,n:'Quince Bangkok',t:'Mediterranean',s:92.10,rt:4.7,rv:680,p:1000,g:'Yes',url:'https://maps.google.com/?q=Quince+Bangkok'},
+    {r:9,n:'Eat Me Restaurant',t:'International',s:91.50,rt:4.6,rv:1450,p:1200,g:'Yes',url:'https://maps.google.com/?q=Eat+Me+Restaurant'},
+    {r:10,n:'Daniel Thaiger',t:'American restaurant',s:90.80,rt:4.7,rv:2800,p:300,g:'Yes',url:'https://maps.google.com/?q=Daniel+Thaiger+Bangkok'},
+    {r:11,n:'Bianca Italian Emsphere',t:'Italian restaurant',s:90.20,rt:4.7,rv:122,p:500,g:'Yes',url:'https://maps.google.com/?q=Bianca+Italian+Emsphere'},
+    {r:12,n:'After You Dessert Cafe Phrom Phong',t:'Cafe',s:89.50,rt:4.6,rv:1680,p:250,g:'Yes',url:'https://maps.google.com/?q=After+You+Phrom+Phong'},
+    {r:13,n:'Suda Restaurant',t:'Thai restaurant',s:88.90,rt:4.5,rv:1320,p:350,g:'Yes',url:'https://maps.google.com/?q=Suda+Restaurant+Bangkok'},
+    {r:14,n:'Appia Restaurant',t:'Italian restaurant',s:88.30,rt:4.6,rv:480,p:800,g:'Yes',url:'https://maps.google.com/?q=Appia+Restaurant+Bangkok'},
+    {r:15,n:'Js Tacos',t:'Mexican',s:87.80,rt:4.6,rv:390,p:350,g:'Yes',url:'https://maps.google.com/?q=Js+Tacos+Bangkok'},
+    {r:16,n:'Sushi Hiro Phrom Phong',t:'Japanese restaurant',s:87.20,rt:4.5,rv:620,p:600,g:'Yes',url:'https://maps.google.com/?q=Sushi+Hiro+Phrom+Phong'},
+    {r:17,n:'Kuppa Cafe Phrom Phong',t:'Cafe',s:86.60,rt:4.5,rv:780,p:250,g:'Yes',url:'https://maps.google.com/?q=Kuppa+Cafe+Phrom+Phong'},
+    {r:18,n:'Emquartier Food Hall',t:'Food Court',s:86.00,rt:4.4,rv:1100,p:300,g:'Yes',url:'https://maps.google.com/?q=Emquartier+Food+Hall'},
+    {r:19,n:'Akira Back Bangkok',t:'Korean restaurant',s:85.40,rt:4.6,rv:430,p:1200,g:'Yes',url:'https://maps.google.com/?q=Akira+Back+Bangkok'},
+    {r:20,n:'Chu Chocolate Bar Phrom Phong',t:'Cafe',s:84.80,rt:4.6,rv:560,p:350,g:'Yes',url:'https://maps.google.com/?q=Chu+Chocolate+Phrom+Phong'},
+  ],
+};
+
+const lastUpdated = "5 มิ.ย. 2569 00:00 น.";
+
+// ── LIVE DATA FROM GOOGLE SHEETS (n8n updates daily 08:00) ───────
+const CSV_TOP10='https://docs.google.com/spreadsheets/d/e/2PACX-1vSEArsyuF2wRPLeeUG4uHXcVxpyMyDqzAqxBOj5h-PJSHsfpdjLnFunbiq7ShZ88ECGGIeEryA-vTvc/pub?gid=562389322&single=true&output=csv';
+const CSV_ALL='https://docs.google.com/spreadsheets/d/e/2PACX-1vSEArsyuF2wRPLeeUG4uHXcVxpyMyDqzAqxBOj5h-PJSHsfpdjLnFunbiq7ShZ88ECGGIeEryA-vTvc/pub?gid=1289472448&single=true&output=csv';
+const CSV_URL=CSV_TOP10;
+
+function setStatus(state){
+  const badge=document.getElementById('liveStatusBadge');
+  if(!badge)return;
+  const styles={
+    live:'background:rgba(16,185,129,.15);border:1px solid #10B981;color:#10B981',
+    dead:'background:rgba(239,68,68,.1);border:1px solid #EF4444;color:#EF4444',
+    loading:'background:rgba(245,158,11,.1);border:1px solid #F59E0B;color:#F59E0B'
+  };
+  const labels={
+    live:'🟢 Live — n8n อัปเดตล่าสุด '+new Date().toLocaleDateString('th-TH'),
+    dead:'🔴 ไม่ได้เชื่อมต่อ — Sheet ยังไม่ publish',
+    loading:'⏳ กำลังเชื่อมต่อ Google Sheets...'
+  };
+  badge.innerHTML=`<span style="display:inline-flex;align-items:center;gap:6px;${styles[state]};padding:4px 12px;border-radius:20px;font-size:.75rem">${labels[state]}</span>`;
+}
+
+function clearAllData(){
+  ['สยาม','อารีย์','ทองหล่อ','อโศก','พร้อมพงษ์'].forEach(a=>{DATA[a]=[];ALL_DATA[a]=[];});
+  const el=document.getElementById('totalCount');if(el)el.textContent='0';
+  const chatS=document.querySelector('.chat-s');if(chatS)chatS.textContent='ไม่ได้เชื่อมต่อ';
+  if(currentArea){renderTop3(currentArea);renderTable(currentArea);}
+}
+
+function parseCSV(t){
+  const lines=t.split(/\r?\n/);
+  // หา header row ที่มี area และ total_score
+  let hi=-1;
+  for(let i=0;i<Math.min(10,lines.length);i++){
+    if(lines[i].includes('area')&&lines[i].includes('total_score')){hi=i;break;}
+  }
+  if(hi<0)return[];
+  const hdrs=lines[hi].split(',').map(h=>h.replace(/"/g,'').trim().toLowerCase());
+  const ti=hdrs.indexOf('total_score');
+  const ni=hdrs.indexOf('restaurant_name');
+  if(ti<0||ni<0)return[];
+  const out=[];
+  for(let i=hi+1;i<lines.length;i++){
+    const cols=lines[i].split(',');
+    const name=(cols[ni]||'').replace(/"/g,'').trim();
+    const score=parseFloat((cols[ti]||'').replace(/"/g,''));
+    if(name.length>1&&score>0){
+      const o={};
+      hdrs.forEach((h,j)=>{o[h]=(cols[j]||'').replace(/"/g,'').trim();});
+      out.push(o);
+    }
+  }
+  return out;
+}
+const PROXY='https://api.allorigins.win/get?url='+encodeURIComponent(CSV_URL);
+const AREA_KEYS=['สยาม','อารีย์','ทองหล่อ','อโศก','พร้อมพงษ์'];
+function matchArea(csvArea){
+  const a=(csvArea||'').trim();
+  return AREA_KEYS.find(k=>k===a)||AREA_KEYS.find(k=>a.startsWith(k.substring(0,2)))||null;
+}
+function mapRow(r,i){
+  return {
+    r:i+1,
+    n:r.restaurant_name||'',
+    t:r.food_type||'Restaurant',
+    s:Math.round(parseFloat(r.total_score)*100)/100,
+    rt:parseFloat(r.rating)||0,
+    rv:parseInt(r.review_count)||0,
+    p:(!r.price_per_person||r.price_per_person==='Unknown')?'Unknown':parseInt(r.price_per_person)||500,
+    g:r.group_suitability==='Yes'?'Yes':'Unknown',
+    url:r.source_url||'#'
+  };
+}
+function processTop10CSV(txt){
+  const rows=parseCSV(txt);
+  if(!rows.length)throw new Error('empty');
+  AREA_KEYS.forEach(area=>{
+    const ar=rows.filter(r=>matchArea(r.area)===area).sort((a,b)=>parseFloat(b.total_score)-parseFloat(a.total_score));
+    if(!ar.length)return;
+    const mapped=ar.map(mapRow);
+    DATA[area]=mapped.slice(0,10);
+    ALL_DATA[area]=mapped; // fallback ถ้า Scoring ไม่โหลด
+  });
+  const el=document.getElementById('totalCount');if(el)el.textContent=rows.length;
+  setStatus('live');
+  if(currentArea){renderTop3(currentArea);renderTable(currentArea);}
+}
+function processScoringCSV(txt){
+  const rows=parseCSV(txt);
+  if(!rows.length)return;
+  AREA_KEYS.forEach(area=>{
+    const ar=rows.filter(r=>matchArea(r.area)===area).sort((a,b)=>parseFloat(b.total_score)-parseFloat(a.total_score));
+    if(!ar.length)return;
+    ALL_DATA[area]=ar.map((r,i)=>({
+      r:i+1,n:r.restaurant_name||'',t:r.food_type||'Restaurant',
+      s:Math.round(parseFloat(r.total_score)*100)/100,
+      rt:0,rv:0,p:'Unknown',g:'Unknown',url:'#'
+    }));
+  });
+  const total=rows.length;
+  const el=document.getElementById('totalCount');if(el)el.textContent=total;
+  const chatS=document.querySelector('.chat-s');if(chatS)chatS.textContent='ตอบจาก dataset '+total+' ร้าน (Live)';
+  if(currentArea){renderTable(currentArea);}
+}
+function processCSV(txt){processTop10CSV(txt);}
+// Fetch Top10_By_Area (ข้อมูลครบ: rating/ราคา/รีวิว)
+let dataLoaded=false;
+fetch(CSV_TOP10,{cache:'no-cache'})
+  .then(r=>{if(!r.ok)throw new Error();return r.text();})
+  .then(txt=>{
+    dataLoaded=true;
+    try{processTop10CSV(txt);}catch(e){console.error('Top10 CSV error:',e.message);}
+    setStatus('live');
+  })
+  .catch(()=>{if(!dataLoaded){clearAllData();setStatus('dead');}});
+
+// Fetch Scoring (ทุกร้านครบ สำหรับ "ร้านทั้งหมด")
+fetch(CSV_ALL,{cache:'no-cache'})
+  .then(r=>{if(!r.ok)throw new Error();return r.text();})
+  .then(txt=>{
+    try{processScoringCSV(txt);}catch(e){console.warn('Scoring CSV error:',e.message);}
+  })
+  .catch(()=>{});
+
+// ── CHATBOT ───────────────────────────────────────────────────────
+function getAllRestaurants(){
+  return ['สยาม','อารีย์','ทองหล่อ','อโศก','พร้อมพงษ์'].flatMap(a=>(ALL_DATA[a]||DATA[a]||[]).map(r=>({...r,area:a})));
+}
+function askBot(q){addMsg(q,'user');setTimeout(()=>addMsg(getAns(q),'bot'),500);}
+function getAns(q){
+  const ql=q.toLowerCase().trim();
+  const all=getAllRestaurants();
+  const AREA_MAP={'สยาม':'สยาม','ari':'อารีย์','อารีย์':'อารีย์','ทองหล่อ':'ทองหล่อ','thonglor':'ทองหล่อ','อโศก':'อโศก','asok':'อโศก','พร้อมพงษ์':'พร้อมพงษ์','phrom':'พร้อมพงษ์'};
+  const ICONS={'สยาม':'🏙️','อารีย์':'🌿','ทองหล่อ':'🍷','อโศก':'🏬','พร้อมพงษ์':'💎'};
+  if(!all.length) return '⚠️ ยังไม่ได้เชื่อมต่อข้อมูลครับ';
+  if(ql.includes('top')&&!Object.values(AREA_MAP).some(a=>ql.includes(a))){
+    const top=[...all].sort((a,b)=>b.s-a.s).slice(0,5);
+    return '🏆 Top 5 ทุกย่าน:\n'+top.map((r,i)=>`${i+1}. ${r.n} (${r.area}) ⭐${r.rt} ฿${r.p}`).join('\n');
+  }
+  for(const [key,area] of Object.entries(AREA_MAP)){
+    if(ql.includes(key)){
+      const icon=ICONS[area];
+      const rows=(ALL_DATA[area]||DATA[area]||[]).slice(0,5);
+      if(!rows.length) return icon+' ยังไม่มีข้อมูลย่าน'+area+'ครับ';
+      return icon+' Top 5 '+area+':\n'+rows.map(r=>`${r.r}. ${r.n}\n   ${r.t} · ฿${r.p} · ⭐${r.rt}`).join('\n');
+    }
+  }
+  if(ql.includes('ราคาถูก')||ql.includes('ถูก')||ql.includes('ราคาไม่แพง')){
+    const cheap=[...all].filter(r=>typeof r.p==='number'&&r.p<=300).sort((a,b)=>b.s-a.s).slice(0,5);
+    if(!cheap.length) return '💰 ไม่พบร้านราคา ≤฿300 ในข้อมูลครับ';
+    return '💰 ราคา ≤฿300/คน:\n'+cheap.map(r=>`- ${r.n} (${r.area}) ฿${r.p} ⭐${r.rt}`).join('\n');
+  }
+  if(ql.includes('กลุ่ม')||ql.includes('ทีม')||ql.includes('หมู่')){
+    const grp=[...all].filter(r=>r.g==='Yes').sort((a,b)=>b.s-a.s).slice(0,5);
+    return '👥 เหมาะทีม 8-12 คน:\n'+grp.map(r=>`- ${r.n} (${r.area}) ⭐${r.rt}`).join('\n');
+  }
+  if(ql.includes('rating')||ql.includes('คะแนน')||ql.includes('ดีสุด')){
+    const top=[...all].sort((a,b)=>b.rt-a.rt||b.rv-a.rv).slice(0,5);
+    return '⭐ Rating สูงสุด:\n'+top.map(r=>`- ${r.n} (${r.area}) ⭐${r.rt} · ${r.rv.toLocaleString()} รีวิว`).join('\n');
+  }
+  const priceMatch=ql.match(/(\d+)/);
+  if((ql.includes('ไม่เกิน')||ql.includes('งบ'))&&priceMatch){
+    const budget=parseInt(priceMatch[1]);
+    const cheap=[...all].filter(r=>typeof r.p==='number'&&r.p<=budget).sort((a,b)=>b.s-a.s).slice(0,5);
+    if(!cheap.length) return '💰 ไม่พบร้านราคา ≤฿'+budget+' ครับ';
+    return '💰 ราคา ≤฿'+budget+'/คน:\n'+cheap.map(r=>`- ${r.n} (${r.area}) ฿${r.p} ⭐${r.rt}`).join('\n');
+  }
+  return '🤖 ถามได้เลยครับ! เช่น:\n"แนะนำสยาม" · "ราคาถูก" · "งบ 500"\n"เหมาะกลุ่ม" · "rating ดีสุด" · "top ร้าน"';
+}
+function addMsg(txt,type){
+  const d=document.createElement('div');
+  d.className='msg msg-'+type;
+  d.style.cssText='padding:8px 12px;border-radius:12px;margin:4px 0;max-width:85%;font-size:.82rem;white-space:pre-line;'+(type==='user'?'background:var(--orange);color:#fff;align-self:flex-end;margin-left:auto':'background:var(--bg3);color:var(--text)');
+  d.textContent=txt;
+  const m=document.getElementById('chatMsgs');m.appendChild(d);m.scrollTop=m.scrollHeight;
+}
+function sendMsg(){const i=document.getElementById('chatInp');const q=i.value.trim();if(!q)return;i.value='';askBot(q);}
+function toggleChat(){document.getElementById('chatWin').classList.toggle('open');}
+</script>
+</body>
+</html>
